@@ -1,0 +1,19 @@
+/* 1️⃣ Import the font first */
+@import url('https://fonts.googleapis.com/css2?family=Russo+One&display=swap');
+
+/* 2️⃣ Tailwind directives */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 3️⃣ Your custom font in utilities layer */
+@layer utilities {
+  .font-russo {
+    font-family: 'Russo One', sans-serif;
+  }
+}
+
+/* 4️⃣ Optional: global body styles */
+body {
+  @apply font-sans bg-white text-gray-800;
+}
