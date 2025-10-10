@@ -5,6 +5,8 @@ import Home from "./Home";
 import MyAccount from "./MyAccount";
 import About from "./About";
 import ContactUs from "./ContactUs";
+import { useGoogleLogin } from '@react-oauth/google';
+import { useEffect } from "react";
 
 const App = () => {
   const [showModal, setShowModal] = useState(false);
@@ -13,6 +15,15 @@ const App = () => {
     email: '',
     password: ''
   });
+  useEffect(() => {
+  const params = new URLSearchParams(window.location.search);
+  const token = params.get("token");
+
+  if (token) {
+    localStorage.setItem("token", token);
+    console.log("Logged in successfully!");
+  }
+}, []);
 
   const handleInputChange = (e) => {
     setFormData({
@@ -20,25 +31,43 @@ const App = () => {
       [e.target.name]: e.target.value
     });
   };
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log('Form submitted:', formData);
-    try {
-      if (formData?.email) {
-        localStorage.setItem('userEmail', formData.email);
-        const derivedName = formData.email.split('@')[0]
-          .split(/[._-]+/)
-          .filter(Boolean)
-          .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
-          .join(' ');
-        localStorage.setItem('userName', derivedName);
-      }
-    } catch (err) {
-      // ignore storage errors
+  try {
+    
+    const url = isLogin
+      ? "http://localhost:5000/api/auth/login"
+      : "http://localhost:5000/api/auth/signup";
+
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData),
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+     
+      localStorage.setItem("token", data.token);
+      console.log("User logged in:", data.user);
+
+      
+      setShowModal(false);
+    } else {
+      
+      alert(data.message || "Check your credentials");
     }
-    // Add your form submission logic here
-  };
+  } catch (err) {
+    console.error("Network error:", err);
+    alert("Network error, please try again");
+  }
+};
+
+ 
 
   const toggleModal = () => {
     setShowModal(!showModal);
@@ -378,7 +407,9 @@ overflow-hidden group will-change-transform [transform:perspective(700px)] hover
 
           {/* Social Login Buttons */}
           <div className="space-y-3 mb-6">
-            <button className="w-full border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-3 px-4 rounded-lg flex items-center justify-center transition-colors">
+            <button 
+              onClick={() => (window.location.href = "http://localhost:5000/api/auth/google")}
+              className="w-full border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-3 px-4 rounded-lg flex items-center justify-center transition-colors">
               <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                 <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
