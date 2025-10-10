@@ -10,12 +10,12 @@ app.use(express.json());
 
 // Simple test route
 app.get("/", (req, res) => {
-  res.send("Server is running!");
+  res.send("Weather server is running!");
 });
 
 /**
  * GET /weather?city=CityName&startDate=YYYY-MM-DD&endDate=YYYY-MM-DD
- * Returns weather forecast for all dates in the range.
+ * Returns either current weather or forecast for a date range.
  */
 app.get("/weather", async (req, res) => {
   try {
@@ -24,13 +24,20 @@ app.get("/weather", async (req, res) => {
     const endDate = req.query.endDate;
     const apiKey = process.env.WEATHER_API_KEY;
 
-    if (!startDate || !endDate) {
-      return res.status(400).json({ error: "startDate and endDate are required." });
-    }
+    let url;
 
-    const url = `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${encodeURIComponent(
-      city
-    )}/${startDate}/${endDate}?unitGroup=metric&key=${apiKey}&include=days`;
+    if (startDate && endDate) {
+      // Forecast for date range
+      url = `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${encodeURIComponent(
+        city
+      )}/${startDate}/${endDate}?unitGroup=metric&key=${apiKey}&include=days`;
+    } else {
+      // Current weather (today)
+      const today = new Date().toISOString().split("T")[0];
+      url = `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${encodeURIComponent(
+        city
+      )}/${today}/${today}?unitGroup=metric&key=${apiKey}&include=days`;
+    }
 
     const response = await fetch(url);
     const data = await response.json();
@@ -43,11 +50,11 @@ app.get("/weather", async (req, res) => {
       }));
 
       res.json({
-        city: data.address,
+        city: data.resolvedAddress || data.address || city,
         forecast,
       });
     } else {
-      res.json({ error: "No forecast available for this period." });
+      res.json({ error: "No forecast available." });
     }
   } catch (err) {
     console.error(err);
@@ -55,4 +62,4 @@ app.get("/weather", async (req, res) => {
   }
 });
 
-app.listen(3000, () => console.log("Server running on http://localhost:3000"));
+app.listen(3000, () => console.log("✅ Server running on http://localhost:3000"));
