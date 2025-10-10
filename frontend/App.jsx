@@ -1,13 +1,17 @@
 import React, { useState } from "react";
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import TripItinerarySection from "./TripItinerarySection";
+import Home from "./Home";
+import MyAccount from "./MyAccount";
+import About from "./About";
+import ContactUs from "./ContactUs";
 
 const App = () => {
   const [showModal, setShowModal] = useState(false);
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
     email: '',
-    password: '',
-    confirmPassword: ''
+    password: ''
   });
 
   const handleInputChange = (e) => {
@@ -20,6 +24,19 @@ const App = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log('Form submitted:', formData);
+    try {
+      if (formData?.email) {
+        localStorage.setItem('userEmail', formData.email);
+        const derivedName = formData.email.split('@')[0]
+          .split(/[._-]+/)
+          .filter(Boolean)
+          .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
+          .join(' ');
+        localStorage.setItem('userName', derivedName);
+      }
+    } catch (err) {
+      // ignore storage errors
+    }
     // Add your form submission logic here
   };
 
@@ -35,13 +52,16 @@ const App = () => {
     setIsLogin(true);
   };
   return (
-    <div className="-my-5 bg-[#FFFFFF]" >
-      {/* ---------- Hero Section ---------- */}
-      <section className="relative h-screen w-full overflow-hidden">
+    <Router>
+      <Routes>
+        <Route path="/" element={
+          <div className="-my-5 bg-[#FFFFFF]" >
+          {/* ---------- Hero Section ---------- */}
+          <section className="relative h-screen w-full overflow-hidden">
         {/* Background image (stays sharp) */}
         <img
           href="#"
-          src="/main2.png"
+          src="/main.png"
           alt="Adventure Background"
           className="absolute top-0 left-0 w-full h-full object-center cursor-pointer"
           style={{
@@ -51,7 +71,7 @@ const App = () => {
         />
 
         {/* Overlay */}
-        <div className="absolute inset-0 bg-black/40"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/30"></div>
 
         {/* Navbar */}
         <nav className="absolute top-0 left-0 w-full flex justify-between items-center px-10 py-6 text-white z-50 opacity-0 [animation:fadeDown_800ms_ease-out_200ms_forwards]">
@@ -68,14 +88,37 @@ const App = () => {
 
 
   <ul className="flex space-x-8">
-    {["Home", "About", "Adventures", "Contact"].map((item) => (
+    {["Home", "About", "Contact"].map((item) => (
       <li key={item}>
-        <a
-          href="#"
-          className="hover:text-yellow-400 cursor-pointer transition duration-300"
-        >
-          {item}
-        </a>
+        {item === "Home" ? (
+          <Link
+            to="/home"
+            className="hover:text-yellow-400 cursor-pointer transition duration-300"
+          >
+            {item}
+          </Link>
+        ) : item === "About" ? (
+          <Link
+            to="/about"
+            className="hover:text-yellow-400 cursor-pointer transition duration-300"
+          >
+            {item}
+          </Link>
+        ) : item === "Contact" ? (
+          <Link
+            to="/contactus"
+            className="hover:text-yellow-400 cursor-pointer transition duration-300"
+          >
+            {item}
+          </Link>
+        ) : (
+          <a
+            href="#"
+            className="hover:text-yellow-400 cursor-pointer transition duration-300"
+          >
+            {item}
+          </a>
+        )}
       </li>
     ))}
   </ul>
@@ -151,8 +194,8 @@ overflow-hidden group will-change-transform [transform:perspective(700px)] hover
         </div>
       </section>
 
-      {/* ---------- Adventure Ideas ---------- */}
-      <section className="text-center bg-[#FFFFFF] py-20">
+      {/* ---------- Adventure Ideas bg-[#afb3b4]  ---------- */}
+      <section className="text-center bg-[#afb3b4] -my-2 py-20">
         <p className="font-licorice text-teal-600 text-5xl font-semibold">Take yourself</p>
         <h2 className="text-3xl font-bold mb-12">Adventure Ideas</h2>
 
@@ -195,7 +238,7 @@ overflow-hidden group will-change-transform [transform:perspective(700px)] hover
 
 
       {/*----------div------------- */}
-    <section className="bg-[#FFFFFF] py-20 px-6">
+    <section className="bg-[#afb3b4] py-20 px-6">
       <div className="max-w-6xl mx-auto text-center">
         <h2 className="text-3xl font-licorice  md:text-6xl font-semibold text-teal-800">
          Features to replace all your other tools
@@ -282,7 +325,7 @@ overflow-hidden group will-change-transform [transform:perspective(700px)] hover
     </section>
 
 
-     <section className="relative flex flex-col md:flex-row items-center justify-between px-8 md:px-24 py-20  overflow-hidden">
+     <section className="relative flex flex-col bg-[#afb3b4] md:flex-row items-center justify-between px-8 md:px-24 py-20  overflow-hidden">
       {/* Background abstract shapes */}
       <div className="absolute top-0 left-0 w-72 h-72 bg-green-100 rounded-full blur-3xl opacity-70 -z-10 translate-x-[-50px] translate-y-[-80px]"></div>
       <div className="absolute top-16 right-0 w-72 h-72 bg-green-100 rounded-full blur-3xl opacity-70 -z-10 translate-x-[120px]"></div>
@@ -440,7 +483,13 @@ overflow-hidden group will-change-transform [transform:perspective(700px)] hover
       </div>
     )}
     </div>
-
+        } />
+        <Route path="/home" element={<Home />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/contactus" element={<ContactUs />} />
+        <Route path="/account" element={<MyAccount />} />
+      </Routes>
+    </Router>
   );
 };
 
