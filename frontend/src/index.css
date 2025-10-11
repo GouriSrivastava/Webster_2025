@@ -1,0 +1,18 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+@layer utilities {
+  .font-russo {
+    font-family: 'Russo One', sans-serif;
+  }
+
+  .font-licorice {
+    font-family: 'Licorice', cursive;
+  }
+}
+
+body {
+  @apply font-mono bg-white text-gray-800;
+}
