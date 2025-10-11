@@ -1145,38 +1145,69 @@ const Home = () => {
               <div className="flex flex-col sm:flex-row gap-4 mt-8">
                 
                 <button
-                  type="button"
-                  onClick={async () => {
-                    try {
-                      setBudgetLoading(true);
-                      setBudgetError("");
-                      setBudgetData(null);
-                      const body = {
-                        origin: formData.source,
-                        destination: formData.destination,
-                        departureDate: formData.startDate,
-                        budgetRange: formData.budget ? (formData.budget === 'under-1000' ? 'range1' : formData.budget === '1000-3000' ? 'range2' : formData.budget === '3000-5000' ? 'range3' : 'range4') : 'range2'
-                      };
-                      const res = await fetch('http://localhost:5000/budget', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(body)
-                      });
-                      const json = await res.json();
-                      if (!res.ok) throw new Error(json.error || 'Failed to fetch budget');
-                      setBudgetData(json);
-                      setBudgetOpen(true);
-                    } catch (e) {
-                      setBudgetError(e.message);
-                    } finally {
-                      setBudgetLoading(false);
-                      setShowRecommendationsCard(true);
-                    }
-                  }}
-                  className="flex-1 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 py-3 px-6 rounded-lg font-semibold transition-colors duration-200"
-                >
-                  Get Budget Summary
-                </button>
+  type="button"
+  onClick={async () => {
+    try {
+      setBudgetLoading(true);
+      setBudgetError("");
+      setBudgetData(null);
+      const body = {
+        origin: formData.source,
+        destination: formData.destination,
+        departureDate: formData.startDate,
+        budgetRange: formData.budget
+          ? formData.budget === "under-1000"
+            ? "range1"
+            : formData.budget === "1000-3000"
+            ? "range2"
+            : formData.budget === "3000-5000"
+            ? "range3"
+            : "range4"
+          : "range2",
+      };
+      const res = await fetch("http://localhost:5000/budget", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || "Failed to fetch budget");
+      setBudgetData(json);
+      setBudgetOpen(true);
+    } catch (e) {
+      setBudgetError(e.message);
+    } finally {
+      setBudgetLoading(false);
+      setShowRecommendationsCard(true);
+    }
+  }}
+  className="flex-1 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 py-3 px-6 rounded-lg font-semibold flex items-center justify-center transition-colors duration-200"
+>
+  {budgetLoading ? (
+    <svg
+      className="animate-spin h-5 w-5 mr-2 text-gray-500"
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+    >
+      <circle
+        className="opacity-25"
+        cx="12"
+        cy="12"
+        r="10"
+        stroke="currentColor"
+        strokeWidth="4"
+      ></circle>
+      <path
+        className="opacity-75"
+        fill="currentColor"
+        d="M4 12a8 8 0 018-8v8H4z"
+      ></path>
+    </svg>
+  ) : null}
+  {budgetLoading ? "Loading..." : "Get Budget Summary"}
+</button>
+
               </div>
             </div>
           </div>
